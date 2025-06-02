@@ -1,3 +1,19 @@
+# foosball_game.py
+# Author: Nuno Lourenço
+# Affiliation: Department of Informatics Engineering, University of Coimbra
+# Email: naml@dei.uc.pt
+# Copyright © 2025 Nuno Lourenço
+# License: MIT License
+
+"""
+This script is part of a foosball game project developed for educational and research purposes.
+
+Unauthorized copying, distribution, or modification of this file, via any medium, is strictly prohibited without
+explicit permission from the author.
+
+Use only for academic or non-commercial purposes, unless otherwise licensed.
+"""
+
 from foosbal import *
 
 
@@ -71,3 +87,6 @@ if __name__ == '__main__':
             verifica_toque_jogador_vermelho(estado_jogo) #verifica se a bola tocou no jogador vermelho
         if estado_jogo['jogador_azul'] is not None:
             verifica_toque_jogador_azul(estado_jogo) #verifica se a bola tocou no jogador azul
+        
+        atualiza_power_bar(estado_jogo, 'jogador_vermelho')
+        atualiza_power_bar(estado_jogo, 'jogador_azul')

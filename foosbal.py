@@ -1,7 +1,24 @@
+# foosball_game.py
+# Author: Nuno Lourenço
+# Affiliation: Department of Informatics Engineering, University of Coimbra
+# Email: naml@dei.uc.pt
+# Copyright © 2025 Nuno Lourenço
+# License: MIT License
+
+"""
+This script is part of a foosball game project developed for educational and research purposes.
+
+Unauthorized copying, distribution, or modification of this file, via any medium, is strictly prohibited without
+explicit permission from the author.
+
+Use only for academic or non-commercial purposes, unless otherwise licensed.
+"""
+
 import turtle as t
 import functools
 import random
 import math
+import time
 
 LARGURA_JANELA = 1024
 ALTURA_JANELA = 600
@@ -18,6 +35,20 @@ BALL_SPEED = 1
 PIXEIS_MOVIMENTO = 25
 
 
+def start_power_shot(estado_jogo, jogador):
+    estado_jogo['power_shot_info'][jogador]['pressed_time'] = time.time()
+
+def release_power_shot(estado_jogo, jogador):
+    pressed = estado_jogo['power_shot_info'][jogador]['pressed_time']
+    if pressed is not None:
+        delta = time.time() - pressed
+        estado_jogo['power_shot_info'][jogador]['duration'] = min(delta, estado_jogo['power_shot_info']['max_duration'])
+        estado_jogo['power_shot_info'][jogador]['pressed_time'] = None
+    estado_jogo[f'power_bar_{jogador.split("_")[1]}'].clear()
+
+def get_power_speed(estado_jogo, jogador):
+    ratio = estado_jogo['power_shot_info'][jogador]['duration'] / estado_jogo['power_shot_info']['max_duration']
+    return estado_jogo['power_shot_info']['base_speed'] + (estado_jogo['power_shot_info']['max_speed'] - estado_jogo['power_shot_info']['base_speed']) * ratio
 
 
 def goto(x,y, t):
@@ -131,6 +162,31 @@ def cria_quadro_resultados():
     quadro.write("Player A: 0\t\tPlayer B: 0 ", align="center", font=('Monaco',24,"normal"))
     return quadro
 
+def atualiza_power_bar(estado_jogo, jogador):
+    barra = estado_jogo[f'power_bar_{jogador.split("_")[1]}']
+    dur = estado_jogo['power_shot_info'][jogador]['duration']
+    if estado_jogo['power_shot_info'][jogador]['pressed_time'] is not None:
+        dur = min(time.time() - estado_jogo['power_shot_info'][jogador]['pressed_time'], estado_jogo['power_shot_info']['max_duration'])
+
+    ratio = dur / estado_jogo['power_shot_info']['max_duration']
+    comprimento = 60
+    altura = 10
+    filled = comprimento * ratio
+
+    barra.clear()
+    barra.goto(estado_jogo[jogador].xcor() - comprimento/2, estado_jogo[jogador].ycor() + 40)
+    barra.pendown()
+    barra.begin_fill()
+    barra.forward(filled)
+    barra.left(90)
+    barra.forward(altura)
+    barra.left(90)
+    barra.forward(filled)
+    barra.left(90)
+    barra.forward(altura)
+    barra.left(90)
+    barra.end_fill()
+    barra.penup()
 
 def terminar_jogo(estado_jogo):
     '''
@@ -152,6 +208,11 @@ def setup(estado_jogo, jogar, funcoes_jogadores):
         janela.onkeypress(functools.partial(funcoes_jogadores['jogador_baixo'], estado_jogo, 'jogador_azul') ,'Down')
         janela.onkeypress(functools.partial(funcoes_jogadores['jogador_esquerda'], estado_jogo, 'jogador_azul') ,'Left')
         janela.onkeypress(functools.partial(funcoes_jogadores['jogador_direita'], estado_jogo, 'jogador_azul') ,'Right')
+        # Jogador vermelho (e.g., left SHIFT)
+        janela.onkeypress(functools.partial(start_power_shot,  estado_jogo, 'jogador_vermelho'), 'Shift_L')
+        janela.onkeyrelease(functools.partial(release_power_shot, estado_jogo, 'jogador_vermelho'), 'Shift_L')
+        janela.onkeypress(functools.partial(start_power_shot,  estado_jogo, 'jogador_azul'), 'Shift_R')
+        janela.onkeyrelease(functools.partial(release_power_shot, estado_jogo, 'jogador_azul'), 'Shift_R')
         janela.onkeypress(functools.partial(terminar_jogo, estado_jogo) ,'Escape')
         quadro = cria_quadro_resultados()
         estado_jogo['quadro'] = quadro
@@ -159,10 +220,25 @@ def setup(estado_jogo, jogar, funcoes_jogadores):
     bola = criar_bola()
     jogador_vermelho = cria_jogador(-((ALTURA_JANELA / 2) + LADO_MENOR_AREA), 0, "red")
     jogador_azul = cria_jogador(((ALTURA_JANELA / 2) + LADO_MENOR_AREA), 0, "blue")
+    estado_jogo['power_bar_vermelho'] = t.Turtle()
+    estado_jogo['power_bar_azul'] = t.Turtle()
+    for barra in [estado_jogo['power_bar_vermelho'], estado_jogo['power_bar_azul']]:
+        barra.hideturtle()
+        barra.penup()
+        barra.color("white")
+
     estado_jogo['janela'] = janela
     estado_jogo['bola'] = bola
     estado_jogo['jogador_vermelho'] = jogador_vermelho
     estado_jogo['jogador_azul'] = jogador_azul
+    estado_jogo['power_shot_info'] = {
+        'jogador_vermelho': {'pressed_time': None, 'duration': 0},
+        'jogador_azul': {'pressed_time': None, 'duration': 0},
+        'max_duration': 2.0,
+        'base_speed': 1,
+        'max_speed': 4,
+}
+    
 
 
 def inicia_jogo(estado_jogo):
@@ -189,8 +265,8 @@ def movimenta_bola(estado_jogo):
     new_x = max(-LARGURA_JANELA/2, min(LARGURA_JANELA/2, new_x))
     new_y = max(-ALTURA_JANELA/2, min(ALTURA_JANELA/2, new_y))
     estado_jogo['bola']['posicao_anterior'] = estado_jogo['bola']['objecto'].pos()
-    print('prev pos', estado_jogo['bola']['posicao_anterior'] )
-    print(new_x- estado_jogo['bola']['posicao_anterior'][0])
+    #print('prev pos', estado_jogo['bola']['posicao_anterior'] )
+    #print(new_x- estado_jogo['bola']['posicao_anterior'][0])
     goto(new_x, new_y, estado_jogo['bola']['objecto'])
 
 def verifica_colisoes_ambiente(estado_jogo):
@@ -219,9 +295,11 @@ def ressalto_bola(jogador, estado_jogo):
             estado_jogo['bola']['objecto'].ycor() - estado_jogo[jogador].ycor(),
             estado_jogo['bola']['objecto'].xcor() - estado_jogo[jogador].xcor()
         )
-    
-    estado_jogo['bola']['velocidade_bola_x'] = BALL_SPEED * math.cos(ang)
-    estado_jogo['bola']['velocidade_bola_y'] = BALL_SPEED * math.sin(ang)
+    speed = get_power_speed(estado_jogo, jogador)
+    estado_jogo['power_shot_info'][jogador]['duration'] = 0  # reset after use
+    print(speed)
+    estado_jogo['bola']['velocidade_bola_x'] = speed * math.cos(ang)
+    estado_jogo['bola']['velocidade_bola_y'] = speed * math.sin(ang)
     
     x_novo = estado_jogo[jogador].xcor() + (RAIO_BOLA+RAIO_JOGADOR+1) * math.cos(ang)
     y_novo = estado_jogo[jogador].ycor() + (RAIO_BOLA+RAIO_JOGADOR+1) * math.sin(ang)
