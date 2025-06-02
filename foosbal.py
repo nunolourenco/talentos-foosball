@@ -1,0 +1,248 @@
+import turtle as t
+import functools
+import random
+import math
+
+LARGURA_JANELA = 1024
+ALTURA_JANELA = 600
+DEFAULT_TURTLE_SIZE = 40
+DEFAULT_TURTLE_SCALE = 3
+RAIO_JOGADOR = DEFAULT_TURTLE_SIZE / DEFAULT_TURTLE_SCALE
+RAIO_BOLA = DEFAULT_TURTLE_SIZE / 2
+LADO_MAIOR_AREA = ALTURA_JANELA / 3
+LADO_MENOR_AREA = 50
+RAIO_MEIO_CAMPO = LADO_MAIOR_AREA / 4
+START_POS_BALIZAS = ALTURA_JANELA / 3
+BOLA_START_POS = (0,0)
+BALL_SPEED = 1
+PIXEIS_MOVIMENTO = 25
+
+
+
+
+def goto(x,y, t):
+    t.pu()
+    t.goto(x,y)
+    t.pd()
+    
+def desenha_baliza(t):
+    for i in range(2):
+        t.fd(LADO_MENOR_AREA)
+        t.rt(90)
+        t.fd(LADO_MAIOR_AREA)
+        t.rt(90)
+        
+def desenha_linhas_campo():
+    t.hideturtle()
+    marcador = t.Turtle()
+    marcador.fillcolor('white')
+    marcador.pencolor('white')
+    marcador.pensize(3)
+    marcador.shape('circle')
+    goto(-LARGURA_JANELA/2, START_POS_BALIZAS/2,marcador)
+    t.seth(0)
+    desenha_baliza(marcador)
+    goto(LARGURA_JANELA/2, -START_POS_BALIZAS/2,marcador)
+    marcador.seth(180)
+    desenha_baliza(marcador)
+
+    goto(0, -ALTURA_JANELA/2,marcador)
+    marcador.seth(90)
+    marcador.goto(0,0)
+    marcador.stamp()
+    marcador.goto(0,ALTURA_JANELA/2)
+    
+    goto(RAIO_MEIO_CAMPO*2,0,marcador)
+    marcador.circle(RAIO_MEIO_CAMPO*2)
+    marcador.hideturtle()
+    ''' Função responsável por desenhar as linhas do campo, 
+    nomeadamente a linha de meio campo, o círculo central, e as balizas. '''
+    pass
+
+
+def inicia_velocidades_bola():
+    direcao_bola = random.random()*math.pi*2
+    velocidade_bola_x = BALL_SPEED*math.cos(direcao_bola)
+    velocidade_bola_y = BALL_SPEED*math.sin(direcao_bola)
+    return velocidade_bola_x, velocidade_bola_y
+def criar_bola():
+    bola = t.Turtle()
+    bola.fillcolor('black')
+    bola.shape('circle')
+    '''
+    Função responsável pela criação da bola. 
+    Deverá considerar que esta tem uma forma redonda, é de cor preta, 
+    começa na posição BOLA_START_POS com uma direção aleatória. 
+    Deverá ter em conta que a velocidade da bola deverá ser superior à dos jogadores. 
+    A função deverá devolver um dicionário contendo 4 elementos: o objeto bola, 
+    a sua velocidade no eixo dos xx, a sua velocidade no eixo dos yy, 
+    e um elemento inicialmente a None que corresponde à posição anterior da mesma.
+    '''
+    velocidade_bola_x, velocidade_bola_y = inicia_velocidades_bola()
+    return {'objecto':bola, 'velocidade_bola_x':velocidade_bola_x, 'velocidade_bola_y':velocidade_bola_y, 'posicao_anterior':None}
+
+
+def cria_jogador(x_pos_inicial, y_pos_inicial, cor):
+    ''' Função responsável por criar e devolver o objeto que corresponde a um jogador (um objecto Turtle). 
+    A função recebe 3 argumentos que correspondem às coordenadas da posição inicial 
+    em xx e yy, e a cor do jogador. A forma dos jogadores deverá ser um círculo, 
+    cujo seu tamanho deverá ser definido através da função shapesize
+    do módulo \texttt{turtle}, usando os seguintes parâmetros: 
+    stretch_wid=DEFAULT_TURTLE_SCALE, stretch_len=DEFAULT_TURTLE_SCALE. '''
+    jogador = t.Turtle()
+    goto(x_pos_inicial, y_pos_inicial, jogador)
+    jogador.shape('circle')
+    jogador.shapesize(stretch_wid=DEFAULT_TURTLE_SCALE, stretch_len=DEFAULT_TURTLE_SCALE)
+    jogador.fillcolor(cor)
+    return jogador
+
+
+def init_state():
+    estado_jogo = {}
+    estado_jogo['bola'] = None
+    estado_jogo['jogador_vermelho'] = None
+    estado_jogo['jogador_azul'] = None
+    estado_jogo['var'] = {
+        'bola' : [],
+        'jogador_vermelho' : [],
+        'jogador_azul' : [],
+    }
+    estado_jogo['pontuacao_jogador_vermelho'] = 0
+    estado_jogo['pontuacao_jogador_azul'] = 0
+    return estado_jogo
+
+def cria_janela():
+    #create a window and declare a variable called window and call the screen()
+    window=t.Screen()
+    window.title("Foosball Game")
+    window.bgcolor("green")
+    window.setup(width = LARGURA_JANELA,height = ALTURA_JANELA)
+    window.tracer(0)
+    return window
+
+def cria_quadro_resultados():
+    #Code for creating pen for scorecard update
+    quadro=t.Turtle()
+    quadro.speed(0)
+    quadro.color("Blue")
+    quadro.penup()
+    quadro.hideturtle()
+    quadro.goto(0,260)
+    quadro.write("Player A: 0\t\tPlayer B: 0 ", align="center", font=('Monaco',24,"normal"))
+    return quadro
+
+
+def terminar_jogo(estado_jogo):
+    '''
+     Função responsável por terminar o jogo. 
+    '''
+    print("Adeus")
+    estado_jogo['janela'].bye()
+
+def setup(estado_jogo, jogar, funcoes_jogadores):
+    janela = cria_janela()
+    #Assign keys to play
+    janela.listen()
+    if jogar:
+        janela.onkeypress(functools.partial(funcoes_jogadores['jogador_cima'], estado_jogo, 'jogador_vermelho') ,'w')
+        janela.onkeypress(functools.partial(funcoes_jogadores['jogador_baixo'], estado_jogo, 'jogador_vermelho') ,'s')
+        janela.onkeypress(functools.partial(funcoes_jogadores['jogador_esquerda'], estado_jogo, 'jogador_vermelho') ,'a')
+        janela.onkeypress(functools.partial(funcoes_jogadores['jogador_direita'], estado_jogo, 'jogador_vermelho') ,'d')
+        janela.onkeypress(functools.partial(funcoes_jogadores['jogador_cima'], estado_jogo, 'jogador_azul') ,'Up')
+        janela.onkeypress(functools.partial(funcoes_jogadores['jogador_baixo'], estado_jogo, 'jogador_azul') ,'Down')
+        janela.onkeypress(functools.partial(funcoes_jogadores['jogador_esquerda'], estado_jogo, 'jogador_azul') ,'Left')
+        janela.onkeypress(functools.partial(funcoes_jogadores['jogador_direita'], estado_jogo, 'jogador_azul') ,'Right')
+        janela.onkeypress(functools.partial(terminar_jogo, estado_jogo) ,'Escape')
+        quadro = cria_quadro_resultados()
+        estado_jogo['quadro'] = quadro
+    desenha_linhas_campo()
+    bola = criar_bola()
+    jogador_vermelho = cria_jogador(-((ALTURA_JANELA / 2) + LADO_MENOR_AREA), 0, "red")
+    jogador_azul = cria_jogador(((ALTURA_JANELA / 2) + LADO_MENOR_AREA), 0, "blue")
+    estado_jogo['janela'] = janela
+    estado_jogo['bola'] = bola
+    estado_jogo['jogador_vermelho'] = jogador_vermelho
+    estado_jogo['jogador_azul'] = jogador_azul
+
+
+def inicia_jogo(estado_jogo):
+    estado_jogo['var' ]['bola'] = []
+    estado_jogo['var']['jogador_vermelho'] = []
+    estado_jogo['var']['jogador_azul'] = []
+    goto(BOLA_START_POS[0],BOLA_START_POS[1], estado_jogo['bola']['objecto'])
+    
+    velocidade_bola_x, velocidade_bola_y = inicia_velocidades_bola()
+    estado_jogo['bola']['velocidade_bola_x'] = velocidade_bola_x
+    estado_jogo['bola']['velocidade_bola_y'] = velocidade_bola_y
+
+def update_board(estado_jogo):
+    estado_jogo['quadro'].clear()
+    estado_jogo['quadro'].write("Player A: {}\t\tPlayer B: {} ".format(estado_jogo['pontuacao_jogador_vermelho'], estado_jogo['pontuacao_jogador_azul']),align="center",font=('Monaco',24,"normal"))
+
+def movimenta_bola(estado_jogo):
+    '''
+    Função responsável pelo movimento da bola que deverá ser feito tendo em conta a
+    posição atual da bola e a direção em xx e yy.
+    '''
+    new_x = estado_jogo['bola']['objecto'].xcor() + estado_jogo['bola']['velocidade_bola_x']
+    new_y = estado_jogo['bola']['objecto'].ycor() + estado_jogo['bola']['velocidade_bola_y']
+    new_x = max(-LARGURA_JANELA/2, min(LARGURA_JANELA/2, new_x))
+    new_y = max(-ALTURA_JANELA/2, min(ALTURA_JANELA/2, new_y))
+    estado_jogo['bola']['posicao_anterior'] = estado_jogo['bola']['objecto'].pos()
+    print('prev pos', estado_jogo['bola']['posicao_anterior'] )
+    print(new_x- estado_jogo['bola']['posicao_anterior'][0])
+    goto(new_x, new_y, estado_jogo['bola']['objecto'])
+
+def verifica_colisoes_ambiente(estado_jogo):
+    '''
+    Função responsável por verificar se há colisões com os limites do ambiente, 
+    atualizando a direção da bola. Não se esqueça de considerar que nas laterais, 
+    fora da zona das balizas, a bola deverá inverter a direção onde atingiu o limite.
+    '''
+    x, y = estado_jogo['bola']['objecto'].xcor(), estado_jogo['bola']['objecto'].ycor()
+    if x-RAIO_BOLA <= -LARGURA_JANELA/2 or x+RAIO_BOLA >= LARGURA_JANELA/2:
+        estado_jogo['bola']['velocidade_bola_x']*=-1
+    if y-RAIO_BOLA <= -ALTURA_JANELA/2 or y+RAIO_BOLA >= ALTURA_JANELA/2:
+        estado_jogo['bola']['velocidade_bola_y']*=-1
+
+def verifica_golos(estado_jogo, verifica_golo_jogador_vermelho, verifica_golo_jogador_azul):
+    
+    golo_vermelho = verifica_golo_jogador_vermelho(estado_jogo)
+    golo_azul = verifica_golo_jogador_azul(estado_jogo)
+    if golo_vermelho or golo_azul:
+        update_board(estado_jogo)
+        inicia_jogo(estado_jogo)
+
+
+def ressalto_bola(jogador, estado_jogo):
+    ang = math.atan2(
+            estado_jogo['bola']['objecto'].ycor() - estado_jogo[jogador].ycor(),
+            estado_jogo['bola']['objecto'].xcor() - estado_jogo[jogador].xcor()
+        )
+    
+    estado_jogo['bola']['velocidade_bola_x'] = BALL_SPEED * math.cos(ang)
+    estado_jogo['bola']['velocidade_bola_y'] = BALL_SPEED * math.sin(ang)
+    
+    x_novo = estado_jogo[jogador].xcor() + (RAIO_BOLA+RAIO_JOGADOR+1) * math.cos(ang)
+    y_novo = estado_jogo[jogador].ycor() + (RAIO_BOLA+RAIO_JOGADOR+1) * math.sin(ang)
+    
+    
+    goto(x_novo,y_novo, estado_jogo['bola']['objecto'])
+
+def verifica_toque_jogador_azul(estado_jogo):
+    '''
+    Função responsável por verificar se o jogador tocou na bola. 
+    Sempre que um jogador toca na bola, deverá mudar a direção desta.
+    '''
+    if(estado_jogo['jogador_azul'].distance(estado_jogo['bola']['objecto'])<RAIO_BOLA+RAIO_JOGADOR):
+        ressalto_bola('jogador_azul', estado_jogo)
+
+
+def verifica_toque_jogador_vermelho(estado_jogo):
+    '''
+    Função responsável por verificar se o jogador tocou na bola. 
+    Sempre que um jogador toca na bola, deverá mudar a direção desta.
+    '''
+    if(estado_jogo['jogador_vermelho'].distance(estado_jogo['bola']['objecto'])<RAIO_BOLA+RAIO_JOGADOR):
+        ressalto_bola('jogador_vermelho', estado_jogo)
+        
