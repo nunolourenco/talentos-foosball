@@ -72,10 +72,13 @@ if __name__ == '__main__':
     funcoes_jogadores = {'jogador_cima': jogador_cima, 'jogador_baixo': jogador_baixo, 'jogador_esquerda': jogador_esquerda, 'jogador_direita': jogador_direita}    
     
     #funções de inicio do jogo
-    estado_jogo = init_state()
+    estado_jogo, estado_campeonato = init_state()
+    print(estado_campeonato)
     setup(estado_jogo, True, funcoes_jogadores)
     inicia_jogo(estado_jogo)
+    desenha_hierarquia_jogos(estado_campeonato) #desenha a hierarquia dos jogos
     while True:
+        
         estado_jogo['janela'].update() #actualiza a janela
         if estado_jogo['bola'] is not None:
             movimenta_bola(estado_jogo) #movimenta a bola

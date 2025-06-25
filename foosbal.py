@@ -20,10 +20,11 @@ import random
 import math
 import time
 
-LARGURA_PAINEL = 250 # 1080
+LARGURA_PAINEL = 350 # 1080
 PADDING_PAINEL = 20 # 100
 LARGURA_JANELA = 1024 # 7560
 ALTURA_JANELA = 600 #1920
+ESPACO_ENTRE_JOGOS = 30
 DEFAULT_TURTLE_SIZE = 40
 DEFAULT_TURTLE_SCALE = 3
 RAIO_JOGADOR = DEFAULT_TURTLE_SIZE / DEFAULT_TURTLE_SCALE
@@ -142,6 +143,78 @@ def cria_jogador(x_pos_inicial, y_pos_inicial, cor):
 
 
 def init_state():
+    estado_campeonato = {}
+    estado_campeonato['jogadores'] = [
+        {'id': 1, 'nome': 'Jogador 1'},
+        {'id': 2, 'nome': 'Jogador 2'},
+        {'id': 3, 'nome': 'Jogador 3'},
+        {'id': 4, 'nome': 'Jogador 4'},
+        {'id': 5, 'nome': 'Jogador 5'},
+        {'id': 6, 'nome': 'Jogador 6'},
+        {'id': 7, 'nome': 'Jogador 7'},
+        {'id': 8, 'nome': 'Jogador 8'},
+    ]
+    estado_campeonato['jogos'] = {
+        'divisao_1': {
+            'jogos': [{
+                'jogador_vermelho': 1,
+                'jogador_azul': 2,
+                'vencedor': None,
+                'pontuacao_jogador_vermelho': 0,
+                'pontuacao_jogador_azul': 0,
+                'nivel': 1,
+            },{
+                'jogador_vermelho': 3,
+                'jogador_azul': 4,
+                'vencedor': None,
+                'pontuacao_jogador_vermelho': 0,
+                'pontuacao_jogador_azul': 0,
+                'nivel': 1,
+            },{
+                'jogador_vermelho': None,
+                'jogador_azul': None,
+                'vencedor': None,
+                'pontuacao_jogador_vermelho': 0,
+                'pontuacao_jogador_azul': 0,
+                'nivel': 2,
+            }],
+            'vencedor': None,
+        },'divisao_2': {
+            'jogos': [{
+                'jogador_vermelho': 5,
+                'jogador_azul': 6,
+                'vencedor': None,
+                'pontuacao_jogador_vermelho': 0,
+                'pontuacao_jogador_azul': 0,
+                'nivel': 1,
+            },{
+                'jogador_vermelho': 7,
+                'jogador_azul': 8,
+                'vencedor': None,
+                'pontuacao_jogador_vermelho': 0,
+                'pontuacao_jogador_azul': 0,
+                'nivel': 1,
+            },{
+                'jogador_vermelho': None,
+                'jogador_azul': None,
+                'vencedor': None,
+                'pontuacao_jogador_vermelho': 0,
+                'pontuacao_jogador_azul': 0,
+                'nivel': 2,
+            }],
+            'vencedor': None,
+        },
+    }
+    estado_campeonato['vencedor'] = None
+    estado_campeonato['jofo_final'] = {
+                'jogador_vermelho': None,
+                'jogador_azul': None,
+                'vencedor': None,
+                'pontuacao_jogador_vermelho': 0,
+                'pontuacao_jogador_azul': 0,
+                'nivel': 3,
+            }
+
     estado_jogo = {}
     estado_jogo['bola'] = None
     estado_jogo['jogador_vermelho'] = None
@@ -153,7 +226,7 @@ def init_state():
     }
     estado_jogo['pontuacao_jogador_vermelho'] = 0
     estado_jogo['pontuacao_jogador_azul'] = 0
-    return estado_jogo
+    return estado_jogo, estado_campeonato
 
 def cria_janela():
     #create a window and declare a variable called window and call the screen()
@@ -169,6 +242,67 @@ def cria_janela():
     window.tracer(0)
     return window
 
+def get_nome_jogador(estado_campeonato, id_jogador):
+    for jogador in estado_campeonato['jogadores']:
+        if jogador['id'] == id_jogador:
+            return jogador['nome']
+    return "—"
+
+def desenha_hierarquia_jogos(estado_campeonato):
+    quadro = t.Turtle()
+    quadro.speed(0)
+    quadro.color("white")
+    quadro.penup()
+    quadro.hideturtle()
+    
+    x_inicial = LARGURA_JANELA/2 
+    y_inicial = ALTURA_JANELA/2 - PADDING_PAINEL*2
+
+    def desenha_divisao(nome_divisao, jogos, y_start):
+        if nome_divisao == 'divisao_1':
+            div_nome = "Divisão 1"
+        elif nome_divisao == 'divisao_2':
+            div_nome = "Divisão 2"
+        quadro.goto(x_inicial, y_start)
+        quadro.write(f"{div_nome}", align="left", font=('Monaco', 11, "bold"))
+        y = y_start - ESPACO_ENTRE_JOGOS
+
+        for jogo in jogos:
+            nome_r = get_nome_jogador(estado_campeonato, jogo['jogador_vermelho']) if jogo['jogador_vermelho'] else "—"
+            nome_a = get_nome_jogador(estado_campeonato, jogo['jogador_azul']) if jogo['jogador_azul'] else "—"
+            texto = f"🔴 {nome_r} vs 🔵 {nome_a}"
+            if jogo['nivel'] == 1:  
+                quadro.goto(x_inicial + 5, y)
+            if jogo['nivel'] == 2:  
+                y -= ESPACO_ENTRE_JOGOS
+                quadro.goto(x_inicial + 5, y)
+            quadro.write(texto, align="left", font=('Monaco', 10, "normal"))
+            y -= ESPACO_ENTRE_JOGOS
+        return y - PADDING_PAINEL
+        
+
+    y_atual = y_inicial
+    for divisao, dados in estado_campeonato['jogos'].items():
+        if divisao == 'divisao_1': 
+            x_inicial = -LARGURA_JANELA/2  - LARGURA_PAINEL + PADDING_PAINEL
+            desenha_divisao(divisao, dados['jogos'], y_atual)
+        else:
+            x_inicial = LARGURA_JANELA/2 + PADDING_PAINEL
+            y_atual = desenha_divisao(divisao, dados['jogos'], y_atual)
+            y_atual -= ESPACO_ENTRE_JOGOS
+        
+
+    # Final
+    quadro.goto(x_inicial, y_atual)
+    quadro.write("Final!", align="left", font=('Monaco', 11, "bold"))
+    final = estado_campeonato.get('jogo_final', {})
+    nome_r = get_nome_jogador(estado_campeonato, final.get('jogador_vermelho')) if final.get('jogador_vermelho') else "—"
+    nome_a = get_nome_jogador(estado_campeonato, final.get('jogador_azul')) if final.get('jogador_azul') else "—"
+    quadro.goto(x_inicial + 5, y_atual - ESPACO_ENTRE_JOGOS)
+    quadro.write(f"🔴 {nome_r} vs 🔵 {nome_a}", align="left", font=('Monaco', 10, "normal"))
+
+    return quadro
+
 def cria_quadro_resultados():
     #Code for creating pen for scorecard update
     quadro=t.Turtle()
@@ -179,30 +313,33 @@ def cria_quadro_resultados():
     quadro.goto(0,260)
     #quadro.write("Player A: 0\t\tPlayer B: 0 ", align="center", font=('Monaco',24,"normal"))
     quadro.write("0 : 0", align="center", font=('Monaco',24,"normal"))
+    quadro.hideturtle()
+    quadro.goto(0,260)
+    quadro.write("Jogador 1\t\t\t\tJogador 2", align="center", font=('Monaco',24,"normal"))
     return quadro
 
 def cria_painel_lateral_red():
     #Code for creating pen for scorecard update
     quadro=t.Turtle()
     quadro.speed(0)
-    quadro.color("Red")
+    quadro.color("White")
     quadro.penup()
     quadro.hideturtle()
     quadro.goto(-LARGURA_JANELA/2 - LARGURA_PAINEL+PADDING_PAINEL,ALTURA_JANELA/2 - PADDING_PAINEL*2)
     #quadro.write("Player A: 0\t\tPlayer B: 0 ", align="center", font=('Monaco',24,"normal"))
-    quadro.write("Teste nome equipa Red", align="left", font=('Monaco',24,"normal"))
+    #quadro.write("Teste nome equipa Red", align="left", font=('Monaco',11,"normal"))
     return quadro
 
 def cria_painel_lateral_blue():
     #Code for creating pen for scorecard update
     quadro=t.Turtle()
     quadro.speed(0)
-    quadro.color("Blue")
+    quadro.color("White")
     quadro.penup()
     quadro.hideturtle()
     quadro.goto(LARGURA_JANELA/2 + PADDING_PAINEL,ALTURA_JANELA/2 - PADDING_PAINEL*2)
     #quadro.write("Player A: 0\t\tPlayer B: 0 ", align="center", font=('Monaco',24,"normal"))
-    quadro.write("Teste nome equipa Blue", align="left", font=('Monaco',24,"normal"))
+    #quadro.write("Teste nome equipa Blue", align="left", font=('Monaco',24,"normal"))
     return quadro
 
 def atualiza_power_bar(estado_jogo, jogador):
