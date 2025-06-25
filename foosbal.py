@@ -20,8 +20,10 @@ import random
 import math
 import time
 
-LARGURA_JANELA = 1024
-ALTURA_JANELA = 600
+LARGURA_PAINEL = 250 # 1080
+PADDING_PAINEL = 20 # 100
+LARGURA_JANELA = 1024 # 7560
+ALTURA_JANELA = 600 
 DEFAULT_TURTLE_SIZE = 40
 DEFAULT_TURTLE_SCALE = 3
 RAIO_JOGADOR = DEFAULT_TURTLE_SIZE / DEFAULT_TURTLE_SCALE
@@ -31,7 +33,7 @@ LADO_MENOR_AREA = 50
 RAIO_MEIO_CAMPO = LADO_MAIOR_AREA / 4
 START_POS_BALIZAS = ALTURA_JANELA / 3
 BOLA_START_POS = (0,0)
-BALL_SPEED = 1
+BALL_SPEED = 7
 PIXEIS_MOVIMENTO = 25
 
 
@@ -68,7 +70,7 @@ def desenha_linhas_campo():
     marcador = t.Turtle()
     marcador.fillcolor('white')
     marcador.pencolor('white')
-    marcador.pensize(3)
+    marcador.pensize(7)
     marcador.shape('circle')
     goto(-LARGURA_JANELA/2, START_POS_BALIZAS/2,marcador)
     t.seth(0)
@@ -85,7 +87,18 @@ def desenha_linhas_campo():
     
     goto(RAIO_MEIO_CAMPO*2,0,marcador)
     marcador.circle(RAIO_MEIO_CAMPO*2)
+
+    # desenha o contorno do campo
+    goto(-LARGURA_JANELA / 2, -ALTURA_JANELA / 2, marcador)
+    marcador.setheading(0)
+    for _ in range(2):
+        marcador.forward(LARGURA_JANELA)
+        marcador.left(90)
+        marcador.forward(ALTURA_JANELA)
+        marcador.left(90)
+
     marcador.hideturtle()
+    
     ''' Função responsável por desenhar as linhas do campo, 
     nomeadamente a linha de meio campo, o círculo central, e as balizas. '''
     pass
@@ -147,7 +160,7 @@ def cria_janela():
     window=t.Screen()
     window.title("Foosball Game")
     window.bgcolor("green")
-    window.setup(width = LARGURA_JANELA,height = ALTURA_JANELA)
+    window.setup(width = LARGURA_JANELA+LARGURA_PAINEL*2,height = ALTURA_JANELA)
     window.tracer(0)
     return window
 
@@ -159,7 +172,32 @@ def cria_quadro_resultados():
     quadro.penup()
     quadro.hideturtle()
     quadro.goto(0,260)
-    quadro.write("Player A: 0\t\tPlayer B: 0 ", align="center", font=('Monaco',24,"normal"))
+    #quadro.write("Player A: 0\t\tPlayer B: 0 ", align="center", font=('Monaco',24,"normal"))
+    quadro.write("0 : 0", align="center", font=('Monaco',24,"normal"))
+    return quadro
+
+def cria_painel_lateral_red():
+    #Code for creating pen for scorecard update
+    quadro=t.Turtle()
+    quadro.speed(0)
+    quadro.color("Red")
+    quadro.penup()
+    quadro.hideturtle()
+    quadro.goto(-LARGURA_JANELA/2 - LARGURA_PAINEL+PADDING_PAINEL,ALTURA_JANELA/2 - PADDING_PAINEL*2)
+    #quadro.write("Player A: 0\t\tPlayer B: 0 ", align="center", font=('Monaco',24,"normal"))
+    quadro.write("Teste nome equipa Red", align="left", font=('Monaco',24,"normal"))
+    return quadro
+
+def cria_painel_lateral_blue():
+    #Code for creating pen for scorecard update
+    quadro=t.Turtle()
+    quadro.speed(0)
+    quadro.color("Blue")
+    quadro.penup()
+    quadro.hideturtle()
+    quadro.goto(LARGURA_JANELA/2 + PADDING_PAINEL,ALTURA_JANELA/2 - PADDING_PAINEL*2)
+    #quadro.write("Player A: 0\t\tPlayer B: 0 ", align="center", font=('Monaco',24,"normal"))
+    quadro.write("Teste nome equipa Blue", align="left", font=('Monaco',24,"normal"))
     return quadro
 
 def atualiza_power_bar(estado_jogo, jogador):
@@ -216,6 +254,8 @@ def setup(estado_jogo, jogar, funcoes_jogadores):
         janela.onkeypress(functools.partial(terminar_jogo, estado_jogo) ,'Escape')
         quadro = cria_quadro_resultados()
         estado_jogo['quadro'] = quadro
+        estado_jogo['painel_red'] = cria_painel_lateral_red()
+        estado_jogo['painel_blue'] = cria_painel_lateral_blue()
     desenha_linhas_campo()
     bola = criar_bola()
     jogador_vermelho = cria_jogador(-((ALTURA_JANELA / 2) + LADO_MENOR_AREA), 0, "red")
@@ -253,7 +293,8 @@ def inicia_jogo(estado_jogo):
 
 def update_board(estado_jogo):
     estado_jogo['quadro'].clear()
-    estado_jogo['quadro'].write("Player A: {}\t\tPlayer B: {} ".format(estado_jogo['pontuacao_jogador_vermelho'], estado_jogo['pontuacao_jogador_azul']),align="center",font=('Monaco',24,"normal"))
+    #estado_jogo['quadro'].write("Player A: {}\t\tPlayer B: {} ".format(estado_jogo['pontuacao_jogador_vermelho'], estado_jogo['pontuacao_jogador_azul']),align="center",font=('Monaco',24,"normal"))
+    estado_jogo['quadro'].write("{} : {}".format(estado_jogo['pontuacao_jogador_vermelho'], estado_jogo['pontuacao_jogador_azul']),align="center",font=('Monaco',24,"normal"))
 
 def movimenta_bola(estado_jogo):
     '''
