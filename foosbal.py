@@ -33,7 +33,7 @@ LADO_MENOR_AREA = 50
 RAIO_MEIO_CAMPO = LADO_MAIOR_AREA / 4
 START_POS_BALIZAS = ALTURA_JANELA / 3
 BOLA_START_POS = (0,0)
-BALL_SPEED = 7
+BALL_SPEED = 20
 PIXEIS_MOVIMENTO = 25
 
 
@@ -161,6 +161,11 @@ def cria_janela():
     window.title("Foosball Game")
     window.bgcolor("green")
     window.setup(width = LARGURA_JANELA+LARGURA_PAINEL*2,height = ALTURA_JANELA)
+    
+    canvas = window.getcanvas()
+    root = canvas.winfo_toplevel()
+    root.overrideredirect(True)  # Remove window decorations
+    
     window.tracer(0)
     return window
 
