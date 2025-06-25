@@ -344,8 +344,8 @@ def ressalto_bola(jogador, estado_jogo):
     speed = get_power_speed(estado_jogo, jogador)
     estado_jogo['power_shot_info'][jogador]['duration'] = 0  # reset after use
     print(speed)
-    estado_jogo['bola']['velocidade_bola_x'] = speed * math.cos(ang)
-    estado_jogo['bola']['velocidade_bola_y'] = speed * math.sin(ang)
+    estado_jogo['bola']['velocidade_bola_x'] = BALL_SPEED * speed * math.cos(ang)
+    estado_jogo['bola']['velocidade_bola_y'] = BALL_SPEED * speed * math.sin(ang)
     
     x_novo = estado_jogo[jogador].xcor() + (RAIO_BOLA+RAIO_JOGADOR+1) * math.cos(ang)
     y_novo = estado_jogo[jogador].ycor() + (RAIO_BOLA+RAIO_JOGADOR+1) * math.sin(ang)
