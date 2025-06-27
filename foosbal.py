@@ -21,11 +21,23 @@ import math
 import time
 import json
 
+MODO_TESTE = True # Modo teste/desenvolvimento (para deploy colocar False)
+
 LARGURA_PAINEL = 350 # 1080
 PADDING_PAINEL = 20 # 100
 LARGURA_JANELA = 1024 # 7560
 ALTURA_JANELA = 600 #1920
 ESPACO_ENTRE_JOGOS = 30
+ESCALA_TIPOGRAFIA = 1
+
+if not MODO_TESTE:
+    LARGURA_PAINEL = 1080
+    PADDING_PAINEL = 100
+    LARGURA_JANELA = 7560
+    ALTURA_JANELA = 1920
+    ESPACO_ENTRE_JOGOS = 100
+    ESCALA_TIPOGRAFIA = 10
+
 DEFAULT_TURTLE_SIZE = 40
 DEFAULT_TURTLE_SCALE = 3
 RAIO_JOGADOR = DEFAULT_TURTLE_SIZE / DEFAULT_TURTLE_SCALE
@@ -160,79 +172,6 @@ def ler_estado_campeonato(filename='estado_campeonato.json'):
         return json.load(f)
 
 def init_state():
-    estado_campeonato = {}
-    
-    estado_campeonato['jogadores'] = [
-        {'id': 1, 'nome': 'Jogador 1'},
-        {'id': 2, 'nome': 'Jogador 2'},
-        {'id': 3, 'nome': 'Jogador 3'},
-        {'id': 4, 'nome': 'Jogador 4'},
-        {'id': 5, 'nome': 'Jogador 5'},
-        {'id': 6, 'nome': 'Jogador 6'},
-        {'id': 7, 'nome': 'Jogador 7'},
-        {'id': 8, 'nome': 'Jogador 8'},
-    ]
-    estado_campeonato['jogos'] = {
-        'divisao_1': {
-            'jogos': [{
-                'jogador_vermelho': 1,
-                'jogador_azul': 2,
-                'vencedor': None,
-                'pontuacao_jogador_vermelho': 0,
-                'pontuacao_jogador_azul': 0,
-                'nivel': 1,
-            },{
-                'jogador_vermelho': 3,
-                'jogador_azul': 4,
-                'vencedor': None,
-                'pontuacao_jogador_vermelho': 0,
-                'pontuacao_jogador_azul': 0,
-                'nivel': 1,
-            },{
-                'jogador_vermelho': None,
-                'jogador_azul': None,
-                'vencedor': None,
-                'pontuacao_jogador_vermelho': 0,
-                'pontuacao_jogador_azul': 0,
-                'nivel': 2,
-            }],
-            'vencedor': None,
-        },'divisao_2': {
-            'jogos': [{
-                'jogador_vermelho': 5,
-                'jogador_azul': 6,
-                'vencedor': None,
-                'pontuacao_jogador_vermelho': 0,
-                'pontuacao_jogador_azul': 0,
-                'nivel': 1,
-            },{
-                'jogador_vermelho': 7,
-                'jogador_azul': 8,
-                'vencedor': None,
-                'pontuacao_jogador_vermelho': 0,
-                'pontuacao_jogador_azul': 0,
-                'nivel': 1,
-            },{
-                'jogador_vermelho': None,
-                'jogador_azul': None,
-                'vencedor': None,
-                'pontuacao_jogador_vermelho': 0,
-                'pontuacao_jogador_azul': 0,
-                'nivel': 2,
-            }],
-            'vencedor': None,
-        },
-    }
-    estado_campeonato['vencedor'] = None
-    estado_campeonato['jofo_final'] = {
-                'jogador_vermelho': None,
-                'jogador_azul': None,
-                'vencedor': None,
-                'pontuacao_jogador_vermelho': 0,
-                'pontuacao_jogador_azul': 0,
-                'nivel': 3,
-            }
-    
     estado_campeonato = ler_estado_campeonato()
 
     estado_jogo = {}
@@ -287,19 +226,19 @@ def desenha_hierarquia_jogos(estado_campeonato):
         elif nome_divisao == 'divisao_2':
             div_nome = "Divisão 2"
         quadro.goto(x_inicial, y_start)
-        quadro.write(f"{div_nome}", align="left", font=('Monaco', 11, "bold"))
+        quadro.write(f"{div_nome}", align="left", font=('Monaco', 11*ESCALA_TIPOGRAFIA, "bold"))
         y = y_start - ESPACO_ENTRE_JOGOS
 
         for jogo in jogos:
             nome_r = get_nome_jogador(estado_campeonato, jogo['jogador_vermelho']) if jogo['jogador_vermelho'] else "—"
             nome_a = get_nome_jogador(estado_campeonato, jogo['jogador_azul']) if jogo['jogador_azul'] else "—"
-            texto = f"🔴 {nome_r} vs 🔵 {nome_a}"
+            texto = f"(R) {nome_r} vs (B) {nome_a}"
             if jogo['nivel'] == 1:  
                 quadro.goto(x_inicial + 5, y)
             if jogo['nivel'] == 2:  
                 y -= ESPACO_ENTRE_JOGOS
                 quadro.goto(x_inicial + 5, y)
-            quadro.write(texto, align="left", font=('Monaco', 10, "normal"))
+            quadro.write(texto, align="left", font=('Monaco', 10*ESCALA_TIPOGRAFIA, "normal"))
             y -= ESPACO_ENTRE_JOGOS
         return y - PADDING_PAINEL
         
@@ -317,12 +256,12 @@ def desenha_hierarquia_jogos(estado_campeonato):
 
     # Final
     quadro.goto(x_inicial, y_atual)
-    quadro.write("Final!", align="left", font=('Monaco', 11, "bold"))
+    quadro.write("Final!", align="left", font=('Monaco', 11*ESCALA_TIPOGRAFIA, "bold"))
     final = estado_campeonato.get('jogo_final', {})
     nome_r = get_nome_jogador(estado_campeonato, final.get('jogador_vermelho')) if final.get('jogador_vermelho') else "—"
     nome_a = get_nome_jogador(estado_campeonato, final.get('jogador_azul')) if final.get('jogador_azul') else "—"
     quadro.goto(x_inicial + 5, y_atual - ESPACO_ENTRE_JOGOS)
-    quadro.write(f"🔴 {nome_r} vs 🔵 {nome_a}", align="left", font=('Monaco', 10, "normal"))
+    quadro.write(f"(R) {nome_r} vs (B) {nome_a}", align="left", font=('Monaco', 10*ESCALA_TIPOGRAFIA, "normal"))
 
     return quadro
 
@@ -330,18 +269,19 @@ def cria_quadro_resultados(estado_campeonato):
     #Code for creating pen for scorecard update
     quadro=t.Turtle()
     quadro.speed(0)
-    quadro.color("Blue")
+    quadro.color("white")
     quadro.penup()
     quadro.hideturtle()
     #quadro.goto(0,260)
-    quadro.goto(0,ALTURA_JANELA/2-PADDING_PAINEL-24)
+    quadro.goto(0,ALTURA_JANELA/2-PADDING_PAINEL-24*ESCALA_TIPOGRAFIA)
     #quadro.write("Player A: 0\t\tPlayer B: 0 ", align="center", font=('Monaco',24,"normal"))
-    quadro.write("0 : 0", align="center", font=('Monaco',24,"normal"))
+    quadro.write("0 : 0", align="center", font=('Monaco',24*ESCALA_TIPOGRAFIA,"normal"))
     quadro.hideturtle()
-    quadro.goto(0,ALTURA_JANELA/2-PADDING_PAINEL-24)
+    quadro.goto(0,ALTURA_JANELA/2-PADDING_PAINEL-24*ESCALA_TIPOGRAFIA)
     #quadro.write("Jogador 1\t\t\t\tJogador 2", align="center", font=('Monaco',24,"normal"))
-    quadro.write("{}\t\t\t\t{}".format(get_nome_jogador(estado_campeonato, JOGADOR_VERMELHO), get_nome_jogador(estado_campeonato, JOGADOR_AZUL)), align="center", font=('Monaco',24,"normal"))
-    print("Jogador 1: {}\t\t\t\tJogador 2: {}".format(get_nome_jogador(estado_campeonato, JOGADOR_VERMELHO), get_nome_jogador(estado_campeonato, JOGADOR_AZUL)))
+    quadro.write("{}\t\t\t\t{}".format(get_nome_jogador(estado_campeonato, JOGADOR_VERMELHO), get_nome_jogador(estado_campeonato, JOGADOR_AZUL)), align="center", font=('Monaco',24*ESCALA_TIPOGRAFIA,"normal"))
+    
+
     return quadro
 
 def cria_quadro_timer():
@@ -351,8 +291,8 @@ def cria_quadro_timer():
     quadro_timer.color((200, 200, 200))  # White color in RGB
     quadro_timer.penup()
     quadro_timer.hideturtle()
-    quadro_timer.goto(0, -92)
-    quadro_timer.write("00:00:000", align="center", font=('Monaco', 92, "normal"))
+    quadro_timer.goto(0, -ALTURA_JANELA/2)
+    quadro_timer.write("00:00", align="center", font=('Monaco', 92*ESCALA_TIPOGRAFIA, "normal"))
     return quadro_timer
 
 def atualiza_power_bar(estado_jogo, jogador):
@@ -386,6 +326,11 @@ def terminar_jogo(estado_jogo, estado_campeonato):
      Função responsável por terminar o jogo. 
     '''
     print("Adeus")
+
+    jogo = encontrar_jogo_por_jogadores(estado_campeonato, JOGADOR_VERMELHO, JOGADOR_AZUL)
+    jogo['vencedor'] = JOGADOR_VERMELHO if estado_jogo['pontuacao_jogador_vermelho'] > estado_jogo['pontuacao_jogador_azul'] else JOGADOR_AZUL if estado_jogo['pontuacao_jogador_azul'] > estado_jogo['pontuacao_jogador_vermelho'] else None
+
+
     guardar_estado_campeonato(estado_campeonato)
     estado_jogo['janela'].bye()
 
@@ -414,7 +359,7 @@ def atualiza_timer(estado_jogo):
         tempo_decorrido = get_formatted_time(estado_jogo['timer'])
         estado_jogo['quadro_timer'].goto(0, -ALTURA_JANELA/2)
         estado_jogo['quadro_timer'].clear()
-        estado_jogo['quadro_timer'].write(f"{tempo_decorrido}", align="center", font=('Monaco', 92, "normal"))
+        estado_jogo['quadro_timer'].write(f"{tempo_decorrido}", align="center", font=('Monaco', 92*ESCALA_TIPOGRAFIA, "normal"))
 
 def setup(estado_jogo, jogar, funcoes_jogadores, estado_campeonato):
     janela = cria_janela()
@@ -438,8 +383,9 @@ def setup(estado_jogo, jogar, funcoes_jogadores, estado_campeonato):
         janela.onkeypress(functools.partial(arrancar_jogo, estado_jogo) ,' ')
 
     
-    estado_jogo['quadro_timer'] = cria_quadro_timer()    
+       
     desenha_linhas_campo()
+    estado_jogo['quadro_timer'] = cria_quadro_timer() 
     estado_jogo['quadro'] =  cria_quadro_resultados(estado_campeonato)
     
 
@@ -487,11 +433,11 @@ def update_board(estado_jogo, estado_campeonato):
     estado_jogo['quadro'].clear()
     #estado_jogo['quadro'].write("Player A: {}\t\tPlayer B: {} ".format(estado_jogo['pontuacao_jogador_vermelho'], estado_jogo['pontuacao_jogador_azul']),align="center",font=('Monaco',24,"normal"))
     
-    estado_jogo['quadro'].write("{} : {}".format(estado_jogo['pontuacao_jogador_vermelho'], estado_jogo['pontuacao_jogador_azul']),align="center",font=('Monaco',24,"normal"))
+    estado_jogo['quadro'].write("{} : {}".format(estado_jogo['pontuacao_jogador_vermelho'], estado_jogo['pontuacao_jogador_azul']),align="center",font=('Monaco',24*ESCALA_TIPOGRAFIA,"normal"))
     
     estado_jogo['quadro'].hideturtle()
-    estado_jogo['quadro'].goto(0,ALTURA_JANELA/2-PADDING_PAINEL-24)
-    estado_jogo['quadro'].write("{}\t\t\t\t{}".format(get_nome_jogador(estado_campeonato, JOGADOR_VERMELHO), get_nome_jogador(estado_campeonato, JOGADOR_AZUL)), align="center", font=('Monaco',24,"normal"))
+    estado_jogo['quadro'].goto(0,ALTURA_JANELA/2-PADDING_PAINEL-24*ESCALA_TIPOGRAFIA)
+    estado_jogo['quadro'].write("{}\t\t\t\t{}".format(get_nome_jogador(estado_campeonato, JOGADOR_VERMELHO), get_nome_jogador(estado_campeonato, JOGADOR_AZUL)), align="center", font=('Monaco',24*ESCALA_TIPOGRAFIA,"normal"))
 
 def encontrar_jogo_por_jogadores(estado_campeonato, jogador1_id, jogador2_id):
     for divisao, info_divisao in estado_campeonato.get('jogos', {}).items():
