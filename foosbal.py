@@ -325,11 +325,12 @@ def cria_quadro_resultados(estado_campeonato):
     quadro.color("Blue")
     quadro.penup()
     quadro.hideturtle()
-    quadro.goto(0,260)
+    #quadro.goto(0,260)
+    quadro.goto(0,ALTURA_JANELA/2-PADDING_PAINEL-24)
     #quadro.write("Player A: 0\t\tPlayer B: 0 ", align="center", font=('Monaco',24,"normal"))
     quadro.write("0 : 0", align="center", font=('Monaco',24,"normal"))
     quadro.hideturtle()
-    quadro.goto(0,260)
+    quadro.goto(0,ALTURA_JANELA/2-PADDING_PAINEL-24)
     #quadro.write("Jogador 1\t\t\t\tJogador 2", align="center", font=('Monaco',24,"normal"))
     quadro.write("{}\t\t\t\t{}".format(get_nome_jogador(estado_campeonato, JOGADOR_VERMELHO), get_nome_jogador(estado_campeonato, JOGADOR_AZUL)), align="center", font=('Monaco',24,"normal"))
     return quadro
@@ -462,7 +463,7 @@ def update_board(estado_jogo, estado_campeonato):
     estado_jogo['quadro'].write("{} : {}".format(estado_jogo['pontuacao_jogador_vermelho'], estado_jogo['pontuacao_jogador_azul']),align="center",font=('Monaco',24,"normal"))
     
     estado_jogo['quadro'].hideturtle()
-    estado_jogo['quadro'].goto(0,260)
+    estado_jogo['quadro'].goto(0,ALTURA_JANELA/2-PADDING_PAINEL-24)
     estado_jogo['quadro'].write("{}\t\t\t\t{}".format(get_nome_jogador(estado_campeonato, JOGADOR_VERMELHO), get_nome_jogador(estado_campeonato, JOGADOR_AZUL)), align="center", font=('Monaco',24,"normal"))
 
 def encontrar_jogo_por_jogadores(estado_campeonato, jogador1_id, jogador2_id):
