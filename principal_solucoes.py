@@ -96,3 +96,5 @@ if __name__ == '__main__':
             
             atualiza_power_bar(estado_jogo, 'jogador_vermelho')
             atualiza_power_bar(estado_jogo, 'jogador_azul')
+
+            atualiza_timer(estado_jogo) #atualiza o timer do jogo

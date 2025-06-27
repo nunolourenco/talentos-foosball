@@ -236,7 +236,7 @@ def init_state():
     estado_campeonato = ler_estado_campeonato()
 
     estado_jogo = {}
-    estado_jogo['arrancou'] = True
+    estado_jogo['arrancou'] = False
 
     estado_jogo['bola'] = None
     estado_jogo['jogador_vermelho'] = None
@@ -344,6 +344,17 @@ def cria_quadro_resultados(estado_campeonato):
     print("Jogador 1: {}\t\t\t\tJogador 2: {}".format(get_nome_jogador(estado_campeonato, JOGADOR_VERMELHO), get_nome_jogador(estado_campeonato, JOGADOR_AZUL)))
     return quadro
 
+def cria_quadro_timer():
+    quadro_timer = t.Turtle()
+    quadro_timer.speed(0)
+    #quadro_timer.color("white")
+    quadro_timer.color((200, 200, 200))  # White color in RGB
+    quadro_timer.penup()
+    quadro_timer.hideturtle()
+    quadro_timer.goto(0, -92)
+    quadro_timer.write("00:00:000", align="center", font=('Monaco', 92, "normal"))
+    return quadro_timer
+
 def atualiza_power_bar(estado_jogo, jogador):
     barra = estado_jogo[f'power_bar_{jogador.split("_")[1]}']
     dur = estado_jogo['power_shot_info'][jogador]['duration']
@@ -390,6 +401,21 @@ def arrancar_jogo(estado_jogo):
     #estado_jogo['bola']['objecto'].setheading(random.randint(0, 360))
     #estado_jogo['bola']['objecto'].speed(BALL_SPEED)    
 
+def get_formatted_time(time_inicial):
+    delta = time.time() - time_inicial  # Current time in seconds (float)
+    minutes = int(delta // 60) % 60
+    seconds = int(delta % 60)
+    milliseconds = int((delta - int(delta)) * 1000)
+    #return f"{minutes:02}:{seconds:02}:{milliseconds:03}"
+    return f"{minutes:02}:{seconds:02}"
+
+def atualiza_timer(estado_jogo):
+    if 'timer' in estado_jogo and estado_jogo['timer'] is not None:
+        tempo_decorrido = get_formatted_time(estado_jogo['timer'])
+        estado_jogo['quadro_timer'].goto(0, -ALTURA_JANELA/2)
+        estado_jogo['quadro_timer'].clear()
+        estado_jogo['quadro_timer'].write(f"{tempo_decorrido}", align="center", font=('Monaco', 92, "normal"))
+
 def setup(estado_jogo, jogar, funcoes_jogadores, estado_campeonato):
     janela = cria_janela()
     #Assign keys to play
@@ -410,11 +436,12 @@ def setup(estado_jogo, jogar, funcoes_jogadores, estado_campeonato):
         janela.onkeyrelease(functools.partial(release_power_shot, estado_jogo, 'jogador_azul'), 'Shift_R')
         janela.onkeypress(functools.partial(terminar_jogo, estado_jogo, estado_campeonato) ,'Escape')
         janela.onkeypress(functools.partial(arrancar_jogo, estado_jogo) ,' ')
-        
-    desenha_linhas_campo()
 
-    quadro = cria_quadro_resultados(estado_campeonato)
-    estado_jogo['quadro'] = quadro
+    
+    estado_jogo['quadro_timer'] = cria_quadro_timer()    
+    desenha_linhas_campo()
+    estado_jogo['quadro'] =  cria_quadro_resultados(estado_campeonato)
+    
 
     bola = criar_bola()
     jogador_vermelho = cria_jogador(-((ALTURA_JANELA / 2) + LADO_MENOR_AREA), 0, "red")
