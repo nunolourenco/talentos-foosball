@@ -19,6 +19,7 @@ import functools
 import random
 import math
 import time
+import json
 
 LARGURA_PAINEL = 350 # 1080
 PADDING_PAINEL = 20 # 100
@@ -36,6 +37,9 @@ START_POS_BALIZAS = ALTURA_JANELA / 3
 BOLA_START_POS = (0,0)
 BALL_SPEED = 20
 PIXEIS_MOVIMENTO = 25
+
+JOGADOR_VERMELHO = 1
+JOGADOR_AZUL = 2
 
 
 def start_power_shot(estado_jogo, jogador):
@@ -141,9 +145,18 @@ def cria_jogador(x_pos_inicial, y_pos_inicial, cor):
     jogador.fillcolor(cor)
     return jogador
 
+def guardar_estado_campeonato(estado, filename='estado_campeonato.json'):
+    with open(filename, 'w', encoding='utf-8') as f:
+        json.dump(estado, f, indent=4, ensure_ascii=False)
+
+
+def ler_estado_campeonato(filename='estado_campeonato.json'):
+    with open(filename, 'r', encoding='utf-8') as f:
+        return json.load(f)
 
 def init_state():
     estado_campeonato = {}
+    
     estado_campeonato['jogadores'] = [
         {'id': 1, 'nome': 'Jogador 1'},
         {'id': 2, 'nome': 'Jogador 2'},
@@ -214,6 +227,8 @@ def init_state():
                 'pontuacao_jogador_azul': 0,
                 'nivel': 3,
             }
+    
+    estado_campeonato = ler_estado_campeonato()
 
     estado_jogo = {}
     estado_jogo['bola'] = None
@@ -303,7 +318,7 @@ def desenha_hierarquia_jogos(estado_campeonato):
 
     return quadro
 
-def cria_quadro_resultados():
+def cria_quadro_resultados(estado_campeonato):
     #Code for creating pen for scorecard update
     quadro=t.Turtle()
     quadro.speed(0)
@@ -315,7 +330,8 @@ def cria_quadro_resultados():
     quadro.write("0 : 0", align="center", font=('Monaco',24,"normal"))
     quadro.hideturtle()
     quadro.goto(0,260)
-    quadro.write("Jogador 1\t\t\t\tJogador 2", align="center", font=('Monaco',24,"normal"))
+    #quadro.write("Jogador 1\t\t\t\tJogador 2", align="center", font=('Monaco',24,"normal"))
+    quadro.write("{}\t\t\t\t{}".format(get_nome_jogador(estado_campeonato, JOGADOR_VERMELHO), get_nome_jogador(estado_campeonato, JOGADOR_AZUL)), align="center", font=('Monaco',24,"normal"))
     return quadro
 
 def cria_painel_lateral_red():
@@ -368,14 +384,15 @@ def atualiza_power_bar(estado_jogo, jogador):
     barra.end_fill()
     barra.penup()
 
-def terminar_jogo(estado_jogo):
+def terminar_jogo(estado_jogo, estado_campeonato):
     '''
      Função responsável por terminar o jogo. 
     '''
     print("Adeus")
+    guardar_estado_campeonato(estado_campeonato)
     estado_jogo['janela'].bye()
 
-def setup(estado_jogo, jogar, funcoes_jogadores):
+def setup(estado_jogo, jogar, funcoes_jogadores, estado_campeonato):
     janela = cria_janela()
     #Assign keys to play
     janela.listen()
@@ -393,8 +410,8 @@ def setup(estado_jogo, jogar, funcoes_jogadores):
         janela.onkeyrelease(functools.partial(release_power_shot, estado_jogo, 'jogador_vermelho'), 'Shift_L')
         janela.onkeypress(functools.partial(start_power_shot,  estado_jogo, 'jogador_azul'), 'Shift_R')
         janela.onkeyrelease(functools.partial(release_power_shot, estado_jogo, 'jogador_azul'), 'Shift_R')
-        janela.onkeypress(functools.partial(terminar_jogo, estado_jogo) ,'Escape')
-        quadro = cria_quadro_resultados()
+        janela.onkeypress(functools.partial(terminar_jogo, estado_jogo, estado_campeonato) ,'Escape')
+        quadro = cria_quadro_resultados(estado_campeonato)
         estado_jogo['quadro'] = quadro
         estado_jogo['painel_red'] = cria_painel_lateral_red()
         estado_jogo['painel_blue'] = cria_painel_lateral_blue()
@@ -433,10 +450,28 @@ def inicia_jogo(estado_jogo):
     estado_jogo['bola']['velocidade_bola_x'] = velocidade_bola_x
     estado_jogo['bola']['velocidade_bola_y'] = velocidade_bola_y
 
-def update_board(estado_jogo):
+def update_board(estado_jogo, estado_campeonato):
     estado_jogo['quadro'].clear()
     #estado_jogo['quadro'].write("Player A: {}\t\tPlayer B: {} ".format(estado_jogo['pontuacao_jogador_vermelho'], estado_jogo['pontuacao_jogador_azul']),align="center",font=('Monaco',24,"normal"))
+    
+    jogo = encontrar_jogo_por_jogadores(estado_campeonato, JOGADOR_VERMELHO, JOGADOR_AZUL)
+
+    jogo['pontuacao_jogador_vermelho'] = estado_jogo['pontuacao_jogador_vermelho']
+    jogo['pontuacao_jogador_azul'] = estado_jogo['pontuacao_jogador_azul']
+
     estado_jogo['quadro'].write("{} : {}".format(estado_jogo['pontuacao_jogador_vermelho'], estado_jogo['pontuacao_jogador_azul']),align="center",font=('Monaco',24,"normal"))
+    
+    estado_jogo['quadro'].hideturtle()
+    estado_jogo['quadro'].goto(0,260)
+    estado_jogo['quadro'].write("{}\t\t\t\t{}".format(get_nome_jogador(estado_campeonato, JOGADOR_VERMELHO), get_nome_jogador(estado_campeonato, JOGADOR_AZUL)), align="center", font=('Monaco',24,"normal"))
+
+def encontrar_jogo_por_jogadores(estado_campeonato, jogador1_id, jogador2_id):
+    for divisao, info_divisao in estado_campeonato.get('jogos', {}).items():
+        for jogo in info_divisao.get('jogos', []):
+            if (jogo['jogador_vermelho'] == jogador1_id and jogo['jogador_azul'] == jogador2_id) or \
+               (jogo['jogador_vermelho'] == jogador2_id and jogo['jogador_azul'] == jogador1_id):
+                return jogo
+    return None
 
 def movimenta_bola(estado_jogo):
     '''
@@ -464,12 +499,12 @@ def verifica_colisoes_ambiente(estado_jogo):
     if y-RAIO_BOLA <= -ALTURA_JANELA/2 or y+RAIO_BOLA >= ALTURA_JANELA/2:
         estado_jogo['bola']['velocidade_bola_y']*=-1
 
-def verifica_golos(estado_jogo, verifica_golo_jogador_vermelho, verifica_golo_jogador_azul):
+def verifica_golos(estado_jogo, estado_campeonato, verifica_golo_jogador_vermelho, verifica_golo_jogador_azul):
     
     golo_vermelho = verifica_golo_jogador_vermelho(estado_jogo)
     golo_azul = verifica_golo_jogador_azul(estado_jogo)
     if golo_vermelho or golo_azul:
-        update_board(estado_jogo)
+        update_board(estado_jogo, estado_campeonato)
         inicia_jogo(estado_jogo)
 
 

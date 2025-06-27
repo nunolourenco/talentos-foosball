@@ -74,7 +74,7 @@ if __name__ == '__main__':
     #funções de inicio do jogo
     estado_jogo, estado_campeonato = init_state()
     print(estado_campeonato)
-    setup(estado_jogo, True, funcoes_jogadores)
+    setup(estado_jogo, True, funcoes_jogadores, estado_campeonato)
     inicia_jogo(estado_jogo)
     desenha_hierarquia_jogos(estado_campeonato) #desenha a hierarquia dos jogos
     while True:
@@ -84,7 +84,7 @@ if __name__ == '__main__':
             movimenta_bola(estado_jogo) #movimenta a bola
 
         verifica_colisoes_ambiente(estado_jogo) #verifica colisoes da bola com o ambiente (para mudar a sua direcao)
-        verifica_golos(estado_jogo, verifica_golo_jogador_vermelho, verifica_golo_jogador_azul) #verifica se houve golo
+        verifica_golos(estado_jogo, estado_campeonato, verifica_golo_jogador_vermelho, verifica_golo_jogador_azul) #verifica se houve golo
         
         if estado_jogo['jogador_vermelho'] is not None:
             verifica_toque_jogador_vermelho(estado_jogo) #verifica se a bola tocou no jogador vermelho

@@ -1,0 +1,105 @@
+{
+    "jogadores": [
+        {
+            "id": 1,
+            "nome": "Equipa 1"
+        },
+        {
+            "id": 2,
+            "nome": "Equipa 2"
+        },
+        {
+            "id": 3,
+            "nome": "Equipa 3"
+        },
+        {
+            "id": 4,
+            "nome": "Equipa 4"
+        },
+        {
+            "id": 5,
+            "nome": "Equipa 5"
+        },
+        {
+            "id": 6,
+            "nome": "Equipa 6"
+        },
+        {
+            "id": 7,
+            "nome": "Equipa 7"
+        },
+        {
+            "id": 8,
+            "nome": "Equipa 8"
+        }
+    ],
+    "jogos": {
+        "divisao_1": {
+            "jogos": [
+                {
+                    "jogador_vermelho": 1,
+                    "jogador_azul": 2,
+                    "vencedor": null,
+                    "pontuacao_jogador_vermelho": 1,
+                    "pontuacao_jogador_azul": 0,
+                    "nivel": 1
+                },
+                {
+                    "jogador_vermelho": 3,
+                    "jogador_azul": 4,
+                    "vencedor": null,
+                    "pontuacao_jogador_vermelho": 0,
+                    "pontuacao_jogador_azul": 0,
+                    "nivel": 1
+                },
+                {
+                    "jogador_vermelho": null,
+                    "jogador_azul": null,
+                    "vencedor": null,
+                    "pontuacao_jogador_vermelho": 0,
+                    "pontuacao_jogador_azul": 0,
+                    "nivel": 2
+                }
+            ],
+            "vencedor": null
+        },
+        "divisao_2": {
+            "jogos": [
+                {
+                    "jogador_vermelho": 5,
+                    "jogador_azul": 6,
+                    "vencedor": null,
+                    "pontuacao_jogador_vermelho": 0,
+                    "pontuacao_jogador_azul": 0,
+                    "nivel": 1
+                },
+                {
+                    "jogador_vermelho": 7,
+                    "jogador_azul": 8,
+                    "vencedor": null,
+                    "pontuacao_jogador_vermelho": 0,
+                    "pontuacao_jogador_azul": 0,
+                    "nivel": 1
+                },
+                {
+                    "jogador_vermelho": null,
+                    "jogador_azul": null,
+                    "vencedor": null,
+                    "pontuacao_jogador_vermelho": 0,
+                    "pontuacao_jogador_azul": 0,
+                    "nivel": 2
+                }
+            ],
+            "vencedor": null
+        }
+    },
+    "vencedor": null,
+    "jofo_final": {
+        "jogador_vermelho": null,
+        "jogador_azul": null,
+        "vencedor": null,
+        "pontuacao_jogador_vermelho": 0,
+        "pontuacao_jogador_azul": 0,
+        "nivel": 3
+    }
+}
