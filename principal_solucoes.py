@@ -15,6 +15,7 @@ Use only for academic or non-commercial purposes, unless otherwise licensed.
 """
 
 from foosbal import *
+import time
 
 
 # Funções responsáveis pelo movimento dos jogadores no ambiente. 
@@ -80,16 +81,18 @@ if __name__ == '__main__':
     while True:
         
         estado_jogo['janela'].update() #actualiza a janela
-        if estado_jogo['bola'] is not None:
-            movimenta_bola(estado_jogo) #movimenta a bola
 
-        verifica_colisoes_ambiente(estado_jogo) #verifica colisoes da bola com o ambiente (para mudar a sua direcao)
-        verifica_golos(estado_jogo, estado_campeonato, verifica_golo_jogador_vermelho, verifica_golo_jogador_azul) #verifica se houve golo
-        
-        if estado_jogo['jogador_vermelho'] is not None:
-            verifica_toque_jogador_vermelho(estado_jogo) #verifica se a bola tocou no jogador vermelho
-        if estado_jogo['jogador_azul'] is not None:
-            verifica_toque_jogador_azul(estado_jogo) #verifica se a bola tocou no jogador azul
-        
-        atualiza_power_bar(estado_jogo, 'jogador_vermelho')
-        atualiza_power_bar(estado_jogo, 'jogador_azul')
+        if estado_jogo['arrancou'] is True:
+            if estado_jogo['bola'] is not None:
+                movimenta_bola(estado_jogo) #movimenta a bola
+
+            verifica_colisoes_ambiente(estado_jogo) #verifica colisoes da bola com o ambiente (para mudar a sua direcao)
+            verifica_golos(estado_jogo, estado_campeonato, verifica_golo_jogador_vermelho, verifica_golo_jogador_azul) #verifica se houve golo
+            
+            if estado_jogo['jogador_vermelho'] is not None:
+                verifica_toque_jogador_vermelho(estado_jogo) #verifica se a bola tocou no jogador vermelho
+            if estado_jogo['jogador_azul'] is not None:
+                verifica_toque_jogador_azul(estado_jogo) #verifica se a bola tocou no jogador azul
+            
+            atualiza_power_bar(estado_jogo, 'jogador_vermelho')
+            atualiza_power_bar(estado_jogo, 'jogador_azul')

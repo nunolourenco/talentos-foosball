@@ -41,6 +41,7 @@ PIXEIS_MOVIMENTO = 25
 JOGADOR_VERMELHO = 1
 JOGADOR_AZUL = 2
 
+t.colormode(255)
 
 def start_power_shot(estado_jogo, jogador):
     estado_jogo['power_shot_info'][jogador]['pressed_time'] = time.time()
@@ -76,6 +77,19 @@ def desenha_linhas_campo():
     marcador.fillcolor('white')
     marcador.pencolor('white')
     marcador.pensize(7)
+
+     # desenha o contorno do campo
+    goto(-LARGURA_JANELA / 2, -ALTURA_JANELA / 2, marcador)
+    marcador.setheading(0)
+    marcador.fillcolor('green')
+    marcador.begin_fill()
+    for _ in range(2):
+        marcador.forward(LARGURA_JANELA)
+        marcador.left(90)
+        marcador.forward(ALTURA_JANELA)
+        marcador.left(90)
+    marcador.end_fill()
+
     marcador.shape('circle')
     goto(-LARGURA_JANELA/2, START_POS_BALIZAS/2,marcador)
     t.seth(0)
@@ -92,15 +106,6 @@ def desenha_linhas_campo():
     
     goto(RAIO_MEIO_CAMPO*2,0,marcador)
     marcador.circle(RAIO_MEIO_CAMPO*2)
-
-    # desenha o contorno do campo
-    goto(-LARGURA_JANELA / 2, -ALTURA_JANELA / 2, marcador)
-    marcador.setheading(0)
-    for _ in range(2):
-        marcador.forward(LARGURA_JANELA)
-        marcador.left(90)
-        marcador.forward(ALTURA_JANELA)
-        marcador.left(90)
 
     marcador.hideturtle()
     
@@ -231,6 +236,8 @@ def init_state():
     estado_campeonato = ler_estado_campeonato()
 
     estado_jogo = {}
+    estado_jogo['arrancou'] = True
+
     estado_jogo['bola'] = None
     estado_jogo['jogador_vermelho'] = None
     estado_jogo['jogador_azul'] = None
@@ -247,7 +254,8 @@ def cria_janela():
     #create a window and declare a variable called window and call the screen()
     window=t.Screen()
     window.title("Foosball Game")
-    window.bgcolor("green")
+    #window.bgcolor("green")
+    window.bgcolor((0, 50, 0))
     window.setup(width = LARGURA_JANELA+LARGURA_PAINEL*2,height = ALTURA_JANELA)
     
     canvas = window.getcanvas()
@@ -333,30 +341,7 @@ def cria_quadro_resultados(estado_campeonato):
     quadro.goto(0,ALTURA_JANELA/2-PADDING_PAINEL-24)
     #quadro.write("Jogador 1\t\t\t\tJogador 2", align="center", font=('Monaco',24,"normal"))
     quadro.write("{}\t\t\t\t{}".format(get_nome_jogador(estado_campeonato, JOGADOR_VERMELHO), get_nome_jogador(estado_campeonato, JOGADOR_AZUL)), align="center", font=('Monaco',24,"normal"))
-    return quadro
-
-def cria_painel_lateral_red():
-    #Code for creating pen for scorecard update
-    quadro=t.Turtle()
-    quadro.speed(0)
-    quadro.color("White")
-    quadro.penup()
-    quadro.hideturtle()
-    quadro.goto(-LARGURA_JANELA/2 - LARGURA_PAINEL+PADDING_PAINEL,ALTURA_JANELA/2 - PADDING_PAINEL*2)
-    #quadro.write("Player A: 0\t\tPlayer B: 0 ", align="center", font=('Monaco',24,"normal"))
-    #quadro.write("Teste nome equipa Red", align="left", font=('Monaco',11,"normal"))
-    return quadro
-
-def cria_painel_lateral_blue():
-    #Code for creating pen for scorecard update
-    quadro=t.Turtle()
-    quadro.speed(0)
-    quadro.color("White")
-    quadro.penup()
-    quadro.hideturtle()
-    quadro.goto(LARGURA_JANELA/2 + PADDING_PAINEL,ALTURA_JANELA/2 - PADDING_PAINEL*2)
-    #quadro.write("Player A: 0\t\tPlayer B: 0 ", align="center", font=('Monaco',24,"normal"))
-    #quadro.write("Teste nome equipa Blue", align="left", font=('Monaco',24,"normal"))
+    print("Jogador 1: {}\t\t\t\tJogador 2: {}".format(get_nome_jogador(estado_campeonato, JOGADOR_VERMELHO), get_nome_jogador(estado_campeonato, JOGADOR_AZUL)))
     return quadro
 
 def atualiza_power_bar(estado_jogo, jogador):
@@ -393,6 +378,18 @@ def terminar_jogo(estado_jogo, estado_campeonato):
     guardar_estado_campeonato(estado_campeonato)
     estado_jogo['janela'].bye()
 
+def arrancar_jogo(estado_jogo):
+    '''
+    Função responsável por arrancar o jogo. 
+    Deverá ser chamada quando o jogador pressionar a tecla Enter.
+    '''
+    estado_jogo['timer'] = time.time() #inicializa o timer do jogo
+
+    estado_jogo['arrancou'] = True
+    #estado_jogo['bola']['objecto'].showturtle()
+    #estado_jogo['bola']['objecto'].setheading(random.randint(0, 360))
+    #estado_jogo['bola']['objecto'].speed(BALL_SPEED)    
+
 def setup(estado_jogo, jogar, funcoes_jogadores, estado_campeonato):
     janela = cria_janela()
     #Assign keys to play
@@ -412,11 +409,13 @@ def setup(estado_jogo, jogar, funcoes_jogadores, estado_campeonato):
         janela.onkeypress(functools.partial(start_power_shot,  estado_jogo, 'jogador_azul'), 'Shift_R')
         janela.onkeyrelease(functools.partial(release_power_shot, estado_jogo, 'jogador_azul'), 'Shift_R')
         janela.onkeypress(functools.partial(terminar_jogo, estado_jogo, estado_campeonato) ,'Escape')
-        quadro = cria_quadro_resultados(estado_campeonato)
-        estado_jogo['quadro'] = quadro
-        estado_jogo['painel_red'] = cria_painel_lateral_red()
-        estado_jogo['painel_blue'] = cria_painel_lateral_blue()
+        janela.onkeypress(functools.partial(arrancar_jogo, estado_jogo) ,' ')
+        
     desenha_linhas_campo()
+
+    quadro = cria_quadro_resultados(estado_campeonato)
+    estado_jogo['quadro'] = quadro
+
     bola = criar_bola()
     jogador_vermelho = cria_jogador(-((ALTURA_JANELA / 2) + LADO_MENOR_AREA), 0, "red")
     jogador_azul = cria_jogador(((ALTURA_JANELA / 2) + LADO_MENOR_AREA), 0, "blue")
@@ -442,6 +441,7 @@ def setup(estado_jogo, jogar, funcoes_jogadores, estado_campeonato):
 
 
 def inicia_jogo(estado_jogo):
+    #estado_jogo['arrancou'] = False
     estado_jogo['var' ]['bola'] = []
     estado_jogo['var']['jogador_vermelho'] = []
     estado_jogo['var']['jogador_azul'] = []
@@ -452,14 +452,14 @@ def inicia_jogo(estado_jogo):
     estado_jogo['bola']['velocidade_bola_y'] = velocidade_bola_y
 
 def update_board(estado_jogo, estado_campeonato):
-    estado_jogo['quadro'].clear()
-    #estado_jogo['quadro'].write("Player A: {}\t\tPlayer B: {} ".format(estado_jogo['pontuacao_jogador_vermelho'], estado_jogo['pontuacao_jogador_azul']),align="center",font=('Monaco',24,"normal"))
-    
     jogo = encontrar_jogo_por_jogadores(estado_campeonato, JOGADOR_VERMELHO, JOGADOR_AZUL)
 
     jogo['pontuacao_jogador_vermelho'] = estado_jogo['pontuacao_jogador_vermelho']
     jogo['pontuacao_jogador_azul'] = estado_jogo['pontuacao_jogador_azul']
 
+    estado_jogo['quadro'].clear()
+    #estado_jogo['quadro'].write("Player A: {}\t\tPlayer B: {} ".format(estado_jogo['pontuacao_jogador_vermelho'], estado_jogo['pontuacao_jogador_azul']),align="center",font=('Monaco',24,"normal"))
+    
     estado_jogo['quadro'].write("{} : {}".format(estado_jogo['pontuacao_jogador_vermelho'], estado_jogo['pontuacao_jogador_azul']),align="center",font=('Monaco',24,"normal"))
     
     estado_jogo['quadro'].hideturtle()
