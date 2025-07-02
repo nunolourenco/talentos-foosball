@@ -30,18 +30,24 @@ ALTURA_JANELA = 600 #1920
 ESPACO_ENTRE_JOGOS = 30
 ESCALA_TIPOGRAFIA = 1
 
+
+
+DEFAULT_TURTLE_SIZE = 40
+DEFAULT_TURTLE_SCALE = 3
+
+
 if not MODO_TESTE:
     LARGURA_PAINEL = 1080
     PADDING_PAINEL = 100
     LARGURA_JANELA = 7560
     ALTURA_JANELA = 1920
     ESPACO_ENTRE_JOGOS = 100
-    ESCALA_TIPOGRAFIA = 10
+    ESCALA_TIPOGRAFIA = 3
+    DEFAULT_TURTLE_SCALE = 7 
 
-DEFAULT_TURTLE_SIZE = 40
-DEFAULT_TURTLE_SCALE = 3
+
 RAIO_JOGADOR = DEFAULT_TURTLE_SIZE / DEFAULT_TURTLE_SCALE
-RAIO_BOLA = DEFAULT_TURTLE_SIZE / 2
+RAIO_BOLA = DEFAULT_TURTLE_SIZE / 2 
 LADO_MAIOR_AREA = ALTURA_JANELA / 3
 LADO_MENOR_AREA = 50
 RAIO_MEIO_CAMPO = LADO_MAIOR_AREA / 4
@@ -52,6 +58,7 @@ PIXEIS_MOVIMENTO = 25
 
 JOGADOR_VERMELHO = 1
 JOGADOR_AZUL = 2
+
 
 t.colormode(255)
 
@@ -144,6 +151,7 @@ def criar_bola():
     bola = t.Turtle()
     bola.fillcolor('black')
     bola.shape('circle')
+    #bola.shapesize(RAIO_BOLA/2, RAIO_BOLA/2)
     '''
     Função responsável pela criação da bola. 
     Deverá considerar que esta tem uma forma redonda, é de cor preta, 
@@ -311,12 +319,13 @@ def atualiza_power_bar(estado_jogo, jogador):
         dur = min(time.time() - estado_jogo['power_shot_info'][jogador]['pressed_time'], estado_jogo['power_shot_info']['max_duration'])
 
     ratio = dur / estado_jogo['power_shot_info']['max_duration']
-    comprimento = 60
-    altura = 10
+    comprimento = 40*DEFAULT_TURTLE_SCALE
+    altura = 3*DEFAULT_TURTLE_SCALE
     filled = comprimento * ratio
 
     barra.clear()
-    barra.goto(estado_jogo[jogador].xcor() - comprimento/2, estado_jogo[jogador].ycor() + 40)
+    
+    barra.goto(estado_jogo[jogador].xcor() - comprimento/2, estado_jogo[jogador].ycor() + 13*DEFAULT_TURTLE_SCALE)
     barra.pendown()
     barra.begin_fill()
     barra.forward(filled)
