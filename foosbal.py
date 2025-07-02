@@ -59,12 +59,21 @@ def start_power_shot(estado_jogo, jogador):
     estado_jogo['power_shot_info'][jogador]['pressed_time'] = time.time()
 
 def release_power_shot(estado_jogo, jogador):
+    estado_jogo['power_shot_info'][jogador]['pressed_time'] = None
+    estado_jogo['power_shot_info'][jogador]['duration'] = 0
+    atualiza_power_bar(estado_jogo, jogador)
+
+def check_power_shot(estado_jogo, jogador):
     pressed = estado_jogo['power_shot_info'][jogador]['pressed_time']
     if pressed is not None:
         delta = time.time() - pressed
         estado_jogo['power_shot_info'][jogador]['duration'] = min(delta, estado_jogo['power_shot_info']['max_duration'])
-        estado_jogo['power_shot_info'][jogador]['pressed_time'] = None
-    estado_jogo[f'power_bar_{jogador.split("_")[1]}'].clear()
+        if delta >= estado_jogo['power_shot_info']['max_duration']:
+            # Finaliza o power shot
+            estado_jogo['power_shot_info'][jogador]['pressed_time'] = None
+            estado_jogo['power_shot_info'][jogador]['duration'] = 0
+            
+            atualiza_power_bar(estado_jogo, jogador)
 
 def get_power_speed(estado_jogo, jogador):
     ratio = estado_jogo['power_shot_info'][jogador]['duration'] / estado_jogo['power_shot_info']['max_duration']
@@ -376,9 +385,7 @@ def setup(estado_jogo, jogar, funcoes_jogadores, estado_campeonato):
         janela.onkeypress(functools.partial(funcoes_jogadores['jogador_direita'], estado_jogo, 'jogador_azul') ,'Right')
         # Jogador vermelho (e.g., left SHIFT)
         janela.onkeypress(functools.partial(start_power_shot,  estado_jogo, 'jogador_vermelho'), 'Shift_L')
-        janela.onkeyrelease(functools.partial(release_power_shot, estado_jogo, 'jogador_vermelho'), 'Shift_L')
         janela.onkeypress(functools.partial(start_power_shot,  estado_jogo, 'jogador_azul'), 'Shift_R')
-        janela.onkeyrelease(functools.partial(release_power_shot, estado_jogo, 'jogador_azul'), 'Shift_R')
         janela.onkeypress(functools.partial(terminar_jogo, estado_jogo, estado_campeonato) ,'Escape')
         janela.onkeypress(functools.partial(arrancar_jogo, estado_jogo) ,' ')
 
@@ -489,7 +496,9 @@ def ressalto_bola(jogador, estado_jogo):
         )
     speed = get_power_speed(estado_jogo, jogador)
     estado_jogo['power_shot_info'][jogador]['duration'] = 0  # reset after use
-    print(speed)
+    
+    release_power_shot(estado_jogo, jogador)
+
     estado_jogo['bola']['velocidade_bola_x'] = BALL_SPEED * speed * math.cos(ang)
     estado_jogo['bola']['velocidade_bola_y'] = BALL_SPEED * speed * math.sin(ang)
     

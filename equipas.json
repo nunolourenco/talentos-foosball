@@ -1,0 +1,41 @@
+[{
+    "id": 1,
+    "name": "Equipa A",
+    "secret": "segredoA"
+},
+{
+    "id": 2,
+    "name": "Equipa B",
+    "secret": "segredoB"
+},
+{
+    "id": 3,
+    "name": "Equipa C",
+    "secret": "segredoC"
+},
+{
+    "id": 4,
+    "name": "Equipa D",
+    "secret": "segredoD"
+},
+{
+    "id": 5,
+    "name": "Equipa E",
+    "secret": "segredoE"
+},
+{    
+    "id": 6,
+    "name": "Equipa F",
+    "secret": "segredoF"
+},
+{   
+    "id": 7,
+    "name": "Equipa G",
+    "secret": "segredoG"
+},
+{   
+    "id": 8,
+    "name": "Equipa H",
+    "secret": "segredoH"
+}
+]
