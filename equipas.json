@@ -6,36 +6,36 @@
 {
     "id": 2,
     "name": "Equipa B",
-    "secret": "cfjhce5j7c"
+    "secret": "segredoB"
 },
 {
     "id": 3,
     "name": "Equipa C",
-    "secret": "29pfy3qzn3"
+    "secret": "segredoC"
 },
 {
     "id": 4,
     "name": "Equipa D",
-    "secret": "wzatzk741v"
+    "secret": "segredoD"
 },
 {
     "id": 5,
     "name": "Equipa E",
-    "secret": "xdx2yjimx2"
+    "secret": "segredoE"
 },
 {    
     "id": 6,
     "name": "Equipa F",
-    "secret": "xffwnggs64"
+    "secret": "segredoF"
 },
 {   
     "id": 7,
     "name": "Equipa G",
-    "secret": "599s4yrp0o"
+    "secret": "segredoG"
 },
 {   
     "id": 8,
     "name": "Equipa H",
-    "secret": "h60amr1t5e"
+    "secret": "segredoH"
 }
 ]
