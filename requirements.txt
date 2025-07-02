@@ -1,0 +1,4 @@
+tkinter
+turtle
+opencv-python
+numpy

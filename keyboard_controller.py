@@ -2,7 +2,6 @@
 import socket
 import tkinter as tk
 import json
-import keyboard
 
 ID_EQUIPA = 1  # ID da equipa do cliente
 SECRET_EQUIPA = 'segredoA'  # Código secreto da equipa do cliente
