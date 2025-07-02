@@ -1,41 +1,41 @@
 [{
     "id": 1,
     "name": "Equipa A",
-    "secret": "segredoA"
+    "secret": "ex8isjorzq"
 },
 {
     "id": 2,
     "name": "Equipa B",
-    "secret": "segredoB"
+    "secret": "cfjhce5j7c"
 },
 {
     "id": 3,
     "name": "Equipa C",
-    "secret": "segredoC"
+    "secret": "29pfy3qzn3"
 },
 {
     "id": 4,
     "name": "Equipa D",
-    "secret": "segredoD"
+    "secret": "wzatzk741v"
 },
 {
     "id": 5,
     "name": "Equipa E",
-    "secret": "segredoE"
+    "secret": "xdx2yjimx2"
 },
 {    
     "id": 6,
     "name": "Equipa F",
-    "secret": "segredoF"
+    "secret": "xffwnggs64"
 },
 {   
     "id": 7,
     "name": "Equipa G",
-    "secret": "segredoG"
+    "secret": "599s4yrp0o"
 },
 {   
     "id": 8,
     "name": "Equipa H",
-    "secret": "segredoH"
+    "secret": "h60amr1t5e"
 }
 ]
