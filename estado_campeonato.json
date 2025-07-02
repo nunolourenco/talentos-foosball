@@ -39,9 +39,9 @@
                 {
                     "jogador_vermelho": 1,
                     "jogador_azul": 2,
-                    "vencedor": null,
-                    "pontuacao_jogador_vermelho": 1,
-                    "pontuacao_jogador_azul": 1,
+                    "vencedor": 2,
+                    "pontuacao_jogador_vermelho": 7,
+                    "pontuacao_jogador_azul": 11,
                     "nivel": 1
                 },
                 {
