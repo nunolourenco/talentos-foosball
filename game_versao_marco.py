@@ -60,9 +60,6 @@ def jogador_esquerda(estado_jogo, jogador):
 def start_power_shot(estado_jogo, jogador):
     estado_jogo['power_shot_info'][jogador]['pressed_time'] = time.time()
 
-def end_power_shot(estado_jogo, jogador):
-    estado_jogo['power_shot_info'][jogador]['pressed_time'] = None
-
 
 
 
@@ -72,7 +69,6 @@ comandos = {
     'LEFT': jogador_esquerda,
     'RIGHT': jogador_direita,
     'POWER_SHOT_ON': start_power_shot,
-    'POWER_SHOT_OFF': release_power_shot,
 }
 
 
@@ -247,6 +243,9 @@ if __name__ == '__main__':
             if estado_jogo['jogador_azul'] is not None:
                 verifica_toque_jogador_azul(estado_jogo) #verifica se a bola tocou no jogador azul
             
+            check_power_shot(estado_jogo, 'jogador_vermelho')
+            check_power_shot(estado_jogo, 'jogador_azul')
+
             atualiza_power_bar(estado_jogo, 'jogador_vermelho')
             atualiza_power_bar(estado_jogo, 'jogador_azul')
 
