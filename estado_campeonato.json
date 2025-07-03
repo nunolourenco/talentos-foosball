@@ -2,11 +2,11 @@
     "jogadores": [
         {
             "id": 1,
-            "nome": "Equipa 1"
+            "nome": "Só ser criativo"
         },
         {
             "id": 2,
-            "nome": "Equipa 2"
+            "nome": "Talentos"
         },
         {
             "id": 3,
@@ -14,7 +14,7 @@
         },
         {
             "id": 4,
-            "nome": "Equipa 4"
+            "nome": "Tão Lentos FC"
         },
         {
             "id": 5,
@@ -22,11 +22,11 @@
         },
         {
             "id": 6,
-            "nome": "Equipa 6"
+            "nome": "Zero à esquerda"
         },
         {
             "id": 7,
-            "nome": "Equipa 7"
+            "nome": "{!False}"
         },
         {
             "id": 8,
@@ -40,8 +40,8 @@
                     "jogador_vermelho": 1,
                     "jogador_azul": 2,
                     "vencedor": null,
-                    "pontuacao_jogador_vermelho": 7,
-                    "pontuacao_jogador_azul": 7,
+                    "pontuacao_jogador_vermelho": 0,
+                    "pontuacao_jogador_azul": 0,
                     "nivel": 1
                 },
                 {

@@ -349,7 +349,7 @@ def terminar_jogo(estado_jogo, estado_campeonato):
     jogo['vencedor'] = JOGADOR_VERMELHO if estado_jogo['pontuacao_jogador_vermelho'] > estado_jogo['pontuacao_jogador_azul'] else JOGADOR_AZUL if estado_jogo['pontuacao_jogador_azul'] > estado_jogo['pontuacao_jogador_vermelho'] else None
 
 
-    guardar_estado_campeonato(estado_campeonato)
+    #guardar_estado_campeonato(estado_campeonato)
     estado_jogo['janela'].bye()
 
 def arrancar_jogo(estado_jogo):
